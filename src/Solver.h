@@ -20,11 +20,13 @@ class Solver{
     double r {0.0};
     double vol {0.0};
     double maxVolMultiplier {0.0};
+    std::vector<double> exerciseTimes {};
     // matrix x-axis is grid over t, y-axis is grid over S
     Eigen::MatrixXd leftCoefSparseMat;
     Eigen::MatrixXd rightCoefSparseMat;
 public:
     Solver();
+    // constructor without bermuda exercise schedule
     Solver(int grid1,
            int grid2,
            OptionExpiryType oType,
@@ -38,6 +40,21 @@ public:
            double r,
            double vol,
            double maxMul);
+    // constructor with bermuda exercise schedule
+    Solver(int grid1,
+           int grid2,
+           OptionExpiryType oType,
+           bool callFlag,
+           FiniteDifferenceType dType,
+           double spot,
+           double strike,
+           // maturity is time to maturity(tau), equals T-t
+           double maturity,
+           double dYield,
+           double r,
+           double vol,
+           double maxMul,
+           const std::vector<double> &schedule);
     //setter
     void setMaxVolMultiplier(double m) { maxVolMultiplier = m;}
     void setDiffType(FiniteDifferenceType m) { dType = m;}
@@ -47,4 +64,5 @@ public:
     Eigen::VectorXd optionPayoff();
     void generateCoefSparseMats();
     std::vector<double> Solve(bool calcVega);
+    std::vector<int> generateBermudaET();
 };

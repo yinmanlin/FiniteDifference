@@ -1,6 +1,8 @@
 #include "Solver.h"
 #include <iostream>
 #include <algorithm>
+#include <vector>
+#include <cmath>
 
 Solver::Solver(int grid1,
                int grid2,
@@ -13,9 +15,27 @@ Solver::Solver(int grid1,
                double dYield,
                double r,
                double vol,
-               double maxMul) : gridS(grid1), gridT(grid2), oType(oType), callFlag(callFlag), dType(dType), spot(spot), strike(strike), maturity(maturity), dYield(dYield), r(r), vol(vol), maxVolMultiplier(maxMul)
-{
-}
+               double maxMul) : gridS(grid1), gridT(grid2), 
+               oType(oType), callFlag(callFlag), dType(dType), spot(spot), strike(strike), 
+               maturity(maturity), dYield(dYield), r(r), vol(vol), 
+               maxVolMultiplier(maxMul) {}
+
+Solver::Solver(int grid1,
+               int grid2,
+               OptionExpiryType oType,
+               bool callFlag,
+               FiniteDifferenceType dType,
+               double spot,
+               double strike,
+               double maturity,
+               double dYield,
+               double r,
+               double vol,
+               double maxMul,
+               const std::vector<double>& schedule) : gridS(grid1), gridT(grid2), 
+               oType(oType), callFlag(callFlag), dType(dType), spot(spot), strike(strike), 
+               maturity(maturity), dYield(dYield), r(r), vol(vol), 
+               maxVolMultiplier(maxMul), exerciseTimes {schedule} {}
 
 Eigen::VectorXd Solver::optionPayoff()
 {
@@ -89,6 +109,8 @@ std::vector<double> Solver::Solve(bool calcVega)
     //assert (payoff.cols() == gridS + 1);
     double x_max = vol*sqrt(maturity)*5;
     double dx = 2*x_max/gridS;
+    std::vector<int> et = generateBermudaET();
+
     if (dType == FiniteDifferenceType::Implicit)
     {
         Eigen::MatrixXd dInv = rightCoefSparseMat.inverse();
@@ -106,6 +128,13 @@ std::vector<double> Solver::Solve(bool calcVega)
                 // reinforce early exercise boundary conditions
                 Eigen::VectorXd exerciseCheck {payoff};
                 payoff = payoff.cwiseMax(exerciseCheck);
+            }
+            else if(oType == OptionExpiryType::Bermuda){
+                Eigen::VectorXd exerciseCheck {payoff};
+                auto it = std::find(et.begin(),et.end(),i);
+                if (it != et.end()){
+                    payoff = payoff.cwiseMax(exerciseCheck);
+                }
             }
         }
     }
@@ -126,6 +155,13 @@ std::vector<double> Solver::Solve(bool calcVega)
                 Eigen::VectorXd exerciseCheck {payoff};
                 payoff = payoff.cwiseMax(exerciseCheck);
             }
+            else if(oType == OptionExpiryType::Bermuda){
+                Eigen::VectorXd exerciseCheck {payoff};
+                auto it = std::find(et.begin(),et.end(),i);
+                if (it != et.end()){
+                    payoff = payoff.cwiseMax(exerciseCheck);
+                }
+            }
         }
     }
 
@@ -141,4 +177,15 @@ std::vector<double> Solver::Solve(bool calcVega)
     res.push_back(delta);
     res.push_back(gamma);
     return res;
+}
+
+std::vector<int> Solver::generateBermudaET(){
+    std::vector<int> et {};
+    if (exerciseTimes.size() > 0){
+        double dt = maturity/gridT;
+        for (auto &e : exerciseTimes){
+            et.push_back(std::ceil(e/dt));
+        }
+    }
+    return et;
 }
