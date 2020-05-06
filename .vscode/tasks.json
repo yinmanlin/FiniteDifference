@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: clang++ build active file",
+            "command": "/usr/local/Cellar/llvm/10.0.0_3/bin/clang++",
+            "args": [
+                "-g",
+                "${workspaceFolder}/src/*.cpp",
+                "-I",
+                "/usr/local/Cellar/eigen/3.3.7/include/eigen3",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "shell",
+            "label": "g++-8 build active file",
+            "command": "/usr/local/bin/g++-8",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "/usr/local/bin"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "clang++ build active file",
+            "command": "/usr/local/Cellar/llvm/10.0.0_3/bin/clang++",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "/usr/local/Cellar/llvm/10.0.0_3/bin"
+            }
+        }
+    ]
+}
