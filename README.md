@@ -21,8 +21,8 @@ To initialize a solver object, provide following parameters. <br>
 
 Call .Solve() on a solver object will return the option premium, delta and gamma in a std::vector.
 
-Price European option: <br>
 
+Price European option: <br>
 Solver a1 = Solver(100, 100, <br>
                   OptionExpiryType::European, true,<br>
                   FiniteDifferenceType::Implicit,<br>
@@ -31,7 +31,6 @@ std::vector<double> resA1 {a1.Solve(false)};<br>
 
 
 Price American option: <br>
-
 Solver b = Solver(100, 100,<br>
                   OptionExpiryType::American, true,<br>
                   FiniteDifferenceType::Implicit,<br>
@@ -40,7 +39,6 @@ std::vector<double> resA {b.Solve(false)};<br>
 
 
 Price Bermuda option with exercise schedule input:<br>
-
 std::vector<double> schedule{0.25,0.5,0.75,1.0};<br>
 Solver c = Solver(100, 100,<br>
                   OptionExpiryType::Bermuda, true,<br>
