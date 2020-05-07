@@ -6,7 +6,7 @@ BS::BS(double spot, double strike, double r, double dYield, double maturity, dou
 
 double BS::optionPrice(){
     if (optionType == true){
-        return (spot*normalCDF(d1()) - strike*normalCDF(d2())*exp(-r*maturity));
+        return (spot*exp(-dYield*maturity)*normalCDF(d1()) - strike*normalCDF(d2())*exp(-r*maturity));
     }else{
         return  strike*normalCDF(-d2())*exp(-r*maturity) - spot*normalCDF(-d1());
     }
