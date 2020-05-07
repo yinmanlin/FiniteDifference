@@ -1,7 +1,7 @@
 # FiniteDifference
 
 Usage:
-
+<pre>
 To initialize a solver object, provide following parameters. <br>
     int gridS {0};                         // grid size on stock price <br>
     int gridT {0};                         // grid size on time <br>
@@ -41,4 +41,4 @@ Solver c = Solver(100, 100,<br>
                   FiniteDifferenceType::Implicit,<br>
                   100, 110, 1, 0.2, 0, 0.3, 5, schedule);<br>
 std::vector<double> resC {c.Solve(false)};<br>
-
+<pre>
