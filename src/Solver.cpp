@@ -59,6 +59,7 @@ Eigen::VectorXd Solver::optionPayoff()
                     else d = 0.0;
                     });
     }
+    
     return payoff;
 }
 
@@ -110,7 +111,7 @@ std::vector<double> Solver::Solve(bool calcVega)
     double x_max = vol*sqrt(maturity)*5;
     double dx = 2*x_max/gridS;
     std::vector<int> et = generateBermudaET();
-
+    Eigen::VectorXd exerciseCheck {payoff};
     if (dType == FiniteDifferenceType::Implicit)
     {
         Eigen::MatrixXd dInv = rightCoefSparseMat.inverse();
@@ -126,11 +127,9 @@ std::vector<double> Solver::Solve(bool calcVega)
             else if(oType == OptionExpiryType::American)
             {
                 // reinforce early exercise boundary conditions
-                Eigen::VectorXd exerciseCheck {payoff};
                 payoff = payoff.cwiseMax(exerciseCheck);
             }
             else if(oType == OptionExpiryType::Bermuda){
-                Eigen::VectorXd exerciseCheck {payoff};
                 auto it = std::find(et.begin(),et.end(),i);
                 if (it != et.end()){
                     payoff = payoff.cwiseMax(exerciseCheck);
@@ -152,11 +151,9 @@ std::vector<double> Solver::Solve(bool calcVega)
             else if(oType == OptionExpiryType::American)
             {
                 // reinforce early exercise boundary conditions
-                Eigen::VectorXd exerciseCheck {payoff};
                 payoff = payoff.cwiseMax(exerciseCheck);
             }
             else if(oType == OptionExpiryType::Bermuda){
-                Eigen::VectorXd exerciseCheck {payoff};
                 auto it = std::find(et.begin(),et.end(),i);
                 if (it != et.end()){
                     payoff = payoff.cwiseMax(exerciseCheck);
@@ -171,6 +168,7 @@ std::vector<double> Solver::Solve(bool calcVega)
     double sD = spot*exp(-dx);
     double premium = payoff[n_mid];
     double delta = (payoff[n_mid+1]-payoff[n_mid-1])/(sU-sD);
+    // ref: https://www.csie.ntu.edu.tw/~lyuu/finance1/2016/20160330.pdf
     double gamma = ((payoff[n_mid+1]-payoff[n_mid])/(sU-spot) - (payoff[n_mid]-payoff[n_mid-1])/(spot-sD))/((sU-sD)/2);
     std::vector<double> res;
     res.push_back(premium);
